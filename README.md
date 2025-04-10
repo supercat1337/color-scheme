@@ -53,66 +53,66 @@ setCurrentColorScheme("dark");
 
 ## Functions
 
-### `initThemeModule()`
+### initThemeModule()
 
 Initializes the theme module.
 
-### `adaptInputsToUserPreferredColorScheme()`
+### adaptInputsToUserPreferredColorScheme()
 
 Adapts the color scheme of all input elements on the page to match the user's preferred color scheme.
 
-### `addMetaThemeColor(lightColor = "#FFFFFF", darkColor = "#212529")`
+### addMetaThemeColor(lightColor = "#FFFFFF", darkColor = "#212529")
 
 Adds meta tags to the document head to specify theme colors for light and dark modes.
 
 -   `lightColor`: The theme color for light mode. Default is `"#FFFFFF"`.
 -   `darkColor`: The theme color for dark mode. Default is `"#212529"`.
 
-### `applyColorThemeToElement(theme, element)`
+### applyColorThemeToElement(theme, element)
 
 Applies a color scheme to an HTML element. The theme is used to set the `data-bs-theme` attribute on the root element of the document, which is used by Bootstrap 5 to determine the theme to use for styled components.
 
 -   `theme`: The color scheme to apply to the element. Can be `"dark"`, `"light"`, `"auto"`, or a custom theme.
 -   `element`: The HTML element to apply the color scheme to.
 
-### `getCurrentColorScheme()`
+### getCurrentColorScheme()
 
 Gets the current color scheme of the application.
 
 -   Returns: The current color scheme, which can be `"dark"`, or `"light"`.
 
-### `setCurrentColorScheme(theme)`
+### setCurrentColorScheme(theme)
 
 Sets the current color scheme of the application.
 
 -   `theme`: The color scheme to set as the current color scheme. Can be `"dark"`, `"light"`, or `"auto"`.
 
-### `getPreferredColorScheme()`
+### getPreferredColorScheme()
 
 Determines the user's preferred color scheme.
 
 -   Returns: The user's preferred color scheme, which can be `"dark"` or `"light"`.
 
-### `getSettings()`
+### getSettings()
 
 Gets the current settings of the theme module.
 
 -   Returns: An object containing the current settings, including the current color scheme.
 
-### `setSettings(settings)`
+### setSettings(settings)
 
 Sets the settings of the theme module.
 
 -   `settings`: An object containing the new settings, including the current color scheme.
 
-### `onCurrentColorSchemeChange(callback)`
+### onCurrentColorSchemeChange(callback)
 
 Subscribes to changes in the current color scheme.
 
 -   `callback`: The function to call when the color scheme changes.
 -   Returns: A function that can be called to unsubscribe from the color scheme change events.
 
-### `onSystemColorSchemeChange(callback)`
+### onSystemColorSchemeChange(callback)
 
 Calls the given callback when the user's preferred color scheme changes.
 
