@@ -1,7 +1,7 @@
 {
   "name": "@supercat1337/theme",
   "version": "1.0.0",
-  "description": "A lightweight, efficient, and easy-to-use reactive state management system for JavaScript applications.",
+  "description": "A lightweight, efficient, and easy-to-use theme management system for JavaScript applications.",
   "main": "index.js",
   "scripts": {
     "preinstall": "npm i -g esbuild && npm i -g rollup",
@@ -27,11 +27,12 @@
   "type": "module",
   "moduleResolution": "nodenext",
   "keywords": [
-    "reactive",
-    "state",
-    "state-management",
-    "reactive-state",
-    "scalable state management"
+    "theme",
+    "color scheme",
+    "theme management",
+    "UI",
+    "dark mode",
+    "light mode"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
