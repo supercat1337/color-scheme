@@ -38,5 +38,8 @@
     "registry": "https://registry.npmjs.org"
   },
   "homepage": "https://github.com/supercat1337/theme",
-  "site": "https://github.com/supercat1337/theme"
+  "site": "https://github.com/supercat1337/theme",
+  "dependencies": {
+    "@supercat1337/event-emitter": "^1.0.10"
+  }
 }
