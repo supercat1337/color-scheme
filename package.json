@@ -1,6 +1,6 @@
 {
   "name": "@supercat1337/theme",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A lightweight, efficient, and easy-to-use theme management system for JavaScript applications.",
   "main": "index.js",
   "scripts": {
