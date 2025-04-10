@@ -1,0 +1,41 @@
+{
+  "name": "@supercat1337/theme",
+  "version": "1.0.0",
+  "description": "A lightweight, efficient, and easy-to-use reactive state management system for JavaScript applications.",
+  "main": "index.js",
+  "scripts": {
+    "preinstall": "npm i -g esbuild && npm i -g rollup",
+    "test": "c8 ava",
+    "build": "npm run remove_type_files && npm run build_esm && npm run build_bundle_esm && npm run build_esm_min && npm run create_types",
+    "build_esm": "rollup ./src/index.js --file ./dist/theme.esm.js --format es",
+    "build_bundle_esm": "rollup ./src/index.js --file ./dist/theme.bundle.esm.js --format es --plugin ./node_modules/@rollup/plugin-node-resolve",
+    "build_esm_min": "esbuild --minify --bundle --platform=neutral --legal-comments=none ./src/index.js --outfile=./dist/theme.bundle.esm.min.js",
+    "create_types": "npx -p typescript tsc --project my.tsconfig.types.json",
+    "remove_type_files": "del /q *.d.ts *.d.ts.map && cd dist && del /s /q *.d.ts *.d.ts.map && cd ../src && del /s /q *.d.ts *.d.ts.map && cd ..",
+    "docs": "typedoc --tsconfig \"my.tsconfig.docs.json\" --options \"typedoc.json\"",
+    "docs-md": "typedoc --tsconfig \"my.tsconfig.docs.json\" --options \"typedoc-md.json\""
+  },
+  "author": "Supercat",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@types/node": "^20.12.2",
+    "typedoc": "^0.25.13",
+    "typedoc-plugin-markdown": "^3.17.1",
+    "typedoc-plugin-missing-exports": "^2.2.0"
+  },
+  "type": "module",
+  "moduleResolution": "nodenext",
+  "keywords": [
+    "reactive",
+    "state",
+    "state-management",
+    "reactive-state",
+    "scalable state management"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "homepage": "https://github.com/supercat1337/theme",
+  "site": "https://github.com/supercat1337/theme"
+}
