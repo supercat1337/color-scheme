@@ -1,7 +1,5 @@
 # Theme
 
-================
-
 A lightweight, efficient, and easy-to-use theme management system for JavaScript applications.
 
 ## Overview
