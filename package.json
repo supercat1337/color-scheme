@@ -1,7 +1,7 @@
 {
-  "name": "@supercat1337/theme",
-  "version": "1.0.2",
-  "description": "A lightweight, efficient, and easy-to-use theme management system for JavaScript applications.",
+  "name": "@supercat1337/color-scheme",
+  "version": "1.0.0",
+  "description": "A lightweight, efficient, and easy-to-use scheme management system for JavaScript applications.",
   "main": "index.js",
   "scripts": {
     "preinstall": "npm i -g esbuild && npm i -g rollup",
@@ -38,8 +38,8 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },
-  "homepage": "https://github.com/supercat1337/theme",
-  "site": "https://github.com/supercat1337/theme",
+  "homepage": "https://github.com/supercat1337/color-scheme",
+  "site": "https://github.com/supercat1337/color-scheme",
   "dependencies": {
     "@supercat1337/event-emitter": "^1.0.10"
   }
