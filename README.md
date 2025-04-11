@@ -1,6 +1,6 @@
 # @supercat1337/color-scheme
 
-"A tiny, fast, and easy-to-use color scheme and color theme management system for JavaScript applications that works with Bootstrap 5 and supports dark and light themes.
+A tiny, fast, and easy-to-use color scheme and color theme management system for JavaScript applications that works with Bootstrap 5 and supports dark and light themes.
 
 ## Overview
 
