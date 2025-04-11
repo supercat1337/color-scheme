@@ -89,11 +89,18 @@ Methods:
 
 `The CurrentColorSchemeStorage object` manages the current color scheme, storing it in local storage and providing methods to get, set, and subscribe to changes in the scheme.
 
+Properties:
+
+-   `scheme`: The current color scheme, which can be either "dark" or "light".
+-   `darkThemeName`: The name of the dark theme.
+-   `lightThemeName`: The name of the light theme.
+
 Methods:
 
 -   get `scheme`: Returns the current color scheme.
 -   set `scheme`: Sets the current color scheme to a new value, updating local storage and emitting an event if the scheme changes.
 -   `onSchemeChange`: Subscribes to changes in the current color scheme, calling the provided callback function when the scheme changes, and returns an unsubscribe function.
+-   `getDefaultTheme`: Returns the default theme name based on the current color scheme.
 
 ## Functions
 
