@@ -5,7 +5,7 @@ import {
     currentColorSchemeStorage,
     preferredSchemeStorage,
     systemSchemeStorage,
-} from "../../dist/theme.bundle.esm.js";
+} from "../../dist/color-scheme.bundle.esm.js";
 
 // You can set the color scheme directly using the applyColorTheme function.
 applyColorTheme("dark");
