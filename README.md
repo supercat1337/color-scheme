@@ -10,112 +10,102 @@ This module provides a simple way to manage color schemes in your application. I
 
 ```javascript
 import {
-    getCurrentColorScheme,
-    getPreferredColorScheme,
-    getSettings,
-    initThemeModule,
-    onCurrentColorSchemeChange,
-    onSystemColorSchemeChange,
-    setCurrentColorScheme,
-    setSettings,
+    applyColorTheme,
+    applyColorThemeToElement,
+    currentColorSchemeStorage,
+    preferredSchemeStorage,
+    systemSchemeStorage,
 } from "@supercat1337/theme";
 
-// Initialize the theme module
-initThemeModule();
+// You can set the color scheme directly using the applyColorTheme function.
+applyColorTheme("dark");
 
-let settings = getSettings();
-console.log(settings); // Output: { colorScheme: "auto" }
+// You can also set the color scheme on an HTML element using the applyColorThemeToElement function.
+applyColorThemeToElement(
+    /** @type {HTMLInputElement} */ (document.body.querySelector("h1")),
+    "light"
+);
 
-// Set the persistent theme settings
-setSettings({ colorScheme: "dark" });
+// You can also listen for changes in the current color scheme using the onSchemeChange function.
+const switcher = /** @type {HTMLInputElement} */ (
+    document.querySelector("input")
+);
 
-// Get the user's preferred color scheme
-const preferredColorScheme = getPreferredColorScheme();
-console.log(preferredColorScheme); // Output: "dark" or "light"
+// Initialize the switcher to reflect the current color scheme.
+let darkmode_is_on = currentColorSchemeStorage.scheme === "dark";
+switcher.checked = darkmode_is_on;
 
-// Subscribe to changes in the current color scheme
-onCurrentColorSchemeChange((theme) => {
-    console.log(`Color scheme changed to ${theme}`);
+// Listen for changes in the current color scheme and update the switcher accordingly.
+currentColorSchemeStorage.onSchemeChange((scheme) => {
+    let darkmode_is_on = scheme === "dark";
+    switcher.checked = darkmode_is_on;
 });
 
-onSystemColorSchemeChange((theme) => {
-    console.log(`System color scheme changed to ${theme}`);
+// Listen for changes in the switcher and update the current color scheme accordingly.
+switcher.addEventListener("change", () => {
+    currentColorSchemeStorage.scheme = switcher.checked ? "dark" : "light";
 });
 
-let currentColorScheme = getCurrentColorScheme();
-console.log(currentColorScheme); // Output: "dark" or "light"
+// You can also save the user's preferred color scheme using localStorage.
+// This will allow the user to switch back to their preferred color scheme after closing their browser.
+preferredSchemeStorage.scheme = currentColorSchemeStorage.scheme;
 
-// Set the current color scheme temporarily
-setCurrentColorScheme("dark");
+// You can also listen for changes in the user's preferred color scheme using the onSchemeChange function.
+preferredSchemeStorage.onSchemeChange((scheme) => {
+    console.log(`Preferred Color Scheme: ${scheme}`);
+});
+
+// You can also get the system color scheme.
+console.log(`System Color Scheme: ${systemSchemeStorage.scheme}`);
+
+// You can also listen for changes in the system color scheme using the onSchemeChange function.
+systemSchemeStorage.onSchemeChange((scheme) => {
+    console.log(`System Color Scheme: ${scheme}`);
+});
 ```
+
+## Objects
+
+### SystemSchemeStorage
+
+The SystemSchemeStorage object manages the system color scheme, providing methods to get and subscribe to changes in the scheme.
+
+Methods:
+onSchemeChange(callback): Subscribes to changes in the system color scheme and calls the provided callback function when the scheme changes. Returns an unsubscribe function to stop receiving updates.
+get scheme(): Returns the current system color scheme, which can be either "dark" or "light".
+
+### PreferredSchemeStorage
+
+The PreferredSchemeStorage object manages the user's preferred color scheme, storing it in local storage and providing methods to get, set, and subscribe to changes in the scheme.
+
+Methods:
+get scheme: Returns the current preferred color scheme.
+set scheme: Sets the preferred color scheme to a new value, updating local storage and emitting an event if the scheme changes.
+onSchemeChange: Subscribes to changes in the preferred color scheme, calling the provided callback function when the scheme changes, and returns an unsubscribe function.
+
+### CurrentColorSchemeStorage
+
+The CurrentColorSchemeStorage object manages the current color scheme, storing it in local storage and providing methods to get, set, and subscribe to changes in the scheme.
+
+Methods:
+get scheme: Returns the current color scheme.
+set scheme: Sets the current color scheme to a new value, updating local storage and emitting an event if the scheme changes.
+onSchemeChange: Subscribes to changes in the current color scheme, calling the provided callback function when the scheme changes, and returns an unsubscribe function.
 
 ## Functions
 
-### initThemeModule()
+### applyColorTheme(theme)
 
-Initializes the theme module.
+Applies a color scheme to the root element of the document. The theme is used to set the `data-bs-theme` attribute, which is used by Bootstrap 5 to determine the theme to use for styled components.
 
-### adaptInputsToUserPreferredColorScheme()
+-   `theme`: The color scheme to apply to the root element. Can be `"dark"`, `"light"`, `"auto"`, or a custom theme.
 
-Adapts the color scheme of all input elements on the page to match the user's preferred color scheme.
-
-### addMetaThemeColor(lightColor = "#FFFFFF", darkColor = "#212529")
-
-Adds meta tags to the document head to specify theme colors for light and dark modes.
-
--   `lightColor`: The theme color for light mode. Default is `"#FFFFFF"`.
--   `darkColor`: The theme color for dark mode. Default is `"#212529"`.
-
-### applyColorThemeToElement(theme, element)
+### applyColorThemeToElement(element, theme)
 
 Applies a color scheme to an HTML element. The theme is used to set the `data-bs-theme` attribute on the root element of the document, which is used by Bootstrap 5 to determine the theme to use for styled components.
 
--   `theme`: The color scheme to apply to the element. Can be `"dark"`, `"light"`, `"auto"`, or a custom theme.
 -   `element`: The HTML element to apply the color scheme to.
-
-### getCurrentColorScheme()
-
-Gets the current color scheme of the application.
-
--   Returns: The current color scheme, which can be `"dark"`, or `"light"`.
-
-### setCurrentColorScheme(theme)
-
-Sets the current color scheme of the application.
-
--   `theme`: The color scheme to set as the current color scheme. Can be `"dark"`, `"light"`, or `"auto"`.
-
-### getPreferredColorScheme()
-
-Determines the user's preferred color scheme.
-
--   Returns: The user's preferred color scheme, which can be `"dark"` or `"light"`.
-
-### getSettings()
-
-Gets the current settings of the theme module.
-
--   Returns: An object containing the current settings, including the current color scheme.
-
-### setSettings(settings)
-
-Sets the settings of the theme module.
-
--   `settings`: An object containing the new settings, including the current color scheme.
-
-### onCurrentColorSchemeChange(callback)
-
-Subscribes to changes in the current color scheme.
-
--   `callback`: The function to call when the color scheme changes.
--   Returns: A function that can be called to unsubscribe from the color scheme change events.
-
-### onSystemColorSchemeChange(callback)
-
-Calls the given callback when the user's preferred color scheme changes.
-
--   `callback`: The callback to call when the user's preferred color scheme changes.
--   Returns: A function that can be called to unsubscribe from changes to the user's preferred color scheme.
+-   `theme`: The color scheme to apply to the element. Can be `"dark"`, `"light"`, `"auto"`, or a custom theme.
 
 ## License
 

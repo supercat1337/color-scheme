@@ -1,82 +1,101 @@
 /**
- * Adds a style sheet to the document head that sets the color scheme of inputs to either light or dark,
- * depending on the user's preferred color scheme.
+ * Applies a color scheme to the root element of the document. The theme is used to set the
+ * `data-bs-theme` attribute, which is used by Bootstrap 5 to determine the theme to use for
+ * styled components.
  *
- * @see https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme
+ * @param {"dark"|"light"|string} theme - The color scheme to apply to the element.
  */
-export function adaptInputsToUserPreferredColorScheme(): void;
-/**
- * Adds meta tags to the document head to specify theme colors for light and dark modes.
- *
- * @param {string} [lightColor="#FFFFFF"] - The theme color for light mode.
- * @param {string} [darkColor="#212529"] - The theme color for dark mode.
- */
-export function addMetaThemeColor(lightColor?: string, darkColor?: string): void;
+export function applyColorTheme(theme: "dark" | "light" | string): void;
 /**
  * Applies a color scheme to an HTML element. The theme is used to set the `data-bs-theme` attribute
  * on the root element of the document, which is used by Bootstrap 5 to determine the theme to use for
  * styled components.
  *
- * @param {("dark"|"light"|"auto")} theme - The color scheme to apply to the element.
  * @param {HTMLElement} element - The HTML element to apply the color scheme to.
+ * @param {("dark"|"light"|"auto")} theme - The color scheme to apply to the element.
  */
-export function applyColorThemeToElement(theme: ("dark" | "light" | "auto"), element: HTMLElement): void;
-/**
- * Retrieves the current color scheme.
- *
- * @returns {"dark"|"light"} The current color scheme being used.
- */
-export function getCurrentColorScheme(): "dark" | "light";
-/**
- * Determines the user's preferred color scheme.
- *
- * @returns {"dark"|"light"} "dark" if the user prefers a dark theme, "light" otherwise.
- */
-export function getPreferredColorScheme(): "dark" | "light";
-/**
- * Retrieves the current theme settings.
- *
- * @returns {{colorScheme:"dark"|"light"|"auto"}} The current theme settings.
- */
-export function getSettings(): {
-    colorScheme: "dark" | "light" | "auto";
-};
-/**
- * Initializes the theme module by loading theme settings from local storage, setting the theme
- * meta tags, adapting inputs to the user's preferred color scheme, and setting up an event
- * listener to update the theme when the user's preferred color scheme changes.
- *
- * @param {string} [lightColor="#FFFFFF"] - The theme color for light mode.
- * @param {string} [darkColor="#212529"] - The theme color for dark mode.
- */
-export function initThemeModule(lightColor?: string, darkColor?: string): void;
-/**
- * Subscribes to changes in the current color scheme.
- *
- * @param {(theme: "dark"|"light") => void} callback - The function to call when the color scheme changes.
- * @returns {() => void} A function that can be called to unsubscribe from the color scheme change events.
- */
-export function onCurrentColorSchemeChange(callback: (theme: "dark" | "light") => void): () => void;
-/**
- * Calls the given callback when the user's preferred color scheme changes.
- *
- * @param {(theme: "dark"|"light") => void} callback - The callback to call when the user's preferred color scheme changes.
- * @returns {() => void} A function that can be called to unsubscribe from changes to the user's preferred color scheme.
- */
-export function onSystemColorSchemeChange(callback: (theme: "dark" | "light") => void): () => void;
-/**
- * Sets the current color scheme. The color scheme is used by Bootstrap 5 to determine the style to
- * use for styled components. The color scheme is also used to update the theme meta tags.
- *
- * @param {"dark"|"light"|"auto"} colorScheme - The color scheme to set. Must be either "dark" or "light."
- */
-export function setCurrentColorScheme(colorScheme: "dark" | "light" | "auto"): void;
-/**
- * Sets new theme settings and saves them to local storage.
- *
- * @param { {colorScheme:"dark"|"light"|"auto"} } newSettings - The new theme settings.
- */
-export function setSettings(newSettings: {
-    colorScheme: "dark" | "light" | "auto";
-}): void;
+export function applyColorThemeToElement(element: HTMLElement, theme: ("dark" | "light" | "auto")): void;
+export const currentColorSchemeStorage: CurrentColorSchemeStorage;
+export const preferredSchemeStorage: PreferredSchemeStorage;
+export const systemSchemeStorage: SystemSchemeStorage;
+declare class CurrentColorSchemeStorage {
+    /**
+     * Initializes the CurrentColorSchemeStorage instance by determining the current color scheme.
+     *
+     * @param {SystemSchemeStorage} systemSchemeStorage - An instance of SystemSchemeStorage to retrieve the system color scheme.
+     * @param {PreferredSchemeStorage} preferredSchemeStorage - An instance of preferredSchemeStorage to retrieve the preferred color scheme.
+     */
+    constructor(systemSchemeStorage: SystemSchemeStorage, preferredSchemeStorage: PreferredSchemeStorage);
+    /**
+     * The name of the theme for the dark color scheme.
+     * @type {string}
+     */
+    darkThemeName: string;
+    /**
+     * The name of the theme for the light color scheme.
+     * @type {string}
+     */
+    lightThemeName: string;
+    /**
+     * Subscribes to changes in the current color scheme.
+     *
+     * @param {(scheme: "dark"|"light") => void} callback - The function to call when the color scheme changes.
+     * @returns {() => void} A function that can be called to unsubscribe from the color scheme change events.
+     */
+    onSchemeChange(callback: (scheme: "dark" | "light") => void): () => void;
+    /**
+     * Sets the current color scheme.
+     * @param {"dark"|"light"|"auto"} colorScheme - The color scheme to set. Must be either "dark", "light" or "auto".
+     */
+    set scheme(colorScheme: "dark" | "light");
+    /**
+     * Retrieves the current color scheme.
+     *
+     * @returns {"dark"|"light"} The current color scheme being used.
+     */
+    get scheme(): "dark" | "light";
+    /**
+     * Returns the default theme name based on the current color scheme.
+     *
+     * @returns {string} The name of the theme. Returns `darkThemeName` if the current color scheme is "dark",
+     * otherwise returns `lightThemeName`.
+     */
+    getDefaultTheme(): string;
+    #private;
+}
+declare class PreferredSchemeStorage {
+    /**
+     * Sets the preferred color scheme.
+     * @param {"dark"|"light"|"auto"} scheme
+     */
+    set scheme(scheme: "auto" | "dark" | "light");
+    /**
+     * @returns {"dark"|"light"|"auto"} The preferred color scheme.
+     */
+    get scheme(): "auto" | "dark" | "light";
+    /**
+     * Subscribes to changes in the preferred color scheme.
+     *
+     * @param {(scheme: "dark"|"light"|"auto") => void} callback - The function to call when the preferred color scheme changes.
+     * @returns {() => void} A function that can be called to unsubscribe from the preferred color scheme change events.
+     */
+    onSchemeChange(callback: (scheme: "dark" | "light" | "auto") => void): () => void;
+    #private;
+}
+declare class SystemSchemeStorage {
+    /**
+     * Subscribes to changes in the system color scheme.
+     *
+     * @param {(scheme: "dark"|"light") => void} callback - The function to call when the system color scheme changes.
+     * @returns {() => void} A function that can be called to unsubscribe from the color scheme change events.
+     */
+    onSchemeChange(callback: (scheme: "dark" | "light") => void): () => void;
+    /**
+     * Gets the system color scheme.
+     *
+     * @returns {"dark"|"light"} The system color scheme.
+     */
+    get scheme(): "dark" | "light";
+}
+export {};
 //# sourceMappingURL=theme.esm.d.ts.map

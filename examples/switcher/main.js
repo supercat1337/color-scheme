@@ -1,13 +1,10 @@
 // @ts-check
 
 import {
-    initThemeModule,
-    onCurrentColorSchemeChange,
-    getSettings,
-    setSettings,
-    getCurrentColorScheme,
-    setCurrentColorScheme,
-} from "../dist/theme.bundle.esm.js";
+    currentColorSchemeStorage,
+    systemSchemeStorage,
+    preferredSchemeStorage,
+} from "../../dist/theme.bundle.esm.js";
 import { selectRefs, createFromHTML, generateId } from "./dom-scope.esm.js";
 
 /**
@@ -27,7 +24,7 @@ import { selectRefs, createFromHTML, generateId } from "./dom-scope.esm.js";
 function initToggler() {
     let id = generateId();
     const fragment = createFromHTML(/* html */ `
-        <div class="text-center">
+        <div class="text-center mt-5 mb-5">
             <label class="form-label">Session Color Scheme Settings</label>
             <div class="d-flex justify-content-center mb-3">
                 <span class=""><label class="form-check-label me-2" for="${id}">
@@ -53,16 +50,16 @@ function initToggler() {
 
     const { switcher } = selectRefs(fragment, annotation);
 
-    let darkmode_is_on = getCurrentColorScheme() === "dark";
+    let darkmode_is_on = currentColorSchemeStorage.scheme === "dark";
     switcher.checked = darkmode_is_on;
 
-    onCurrentColorSchemeChange((theme) => {
-        let darkmode_is_on = theme === "dark";
+    currentColorSchemeStorage.onSchemeChange((scheme) => {
+        let darkmode_is_on = scheme === "dark";
         switcher.checked = darkmode_is_on;
     });
 
     switcher.addEventListener("change", () => {
-        setCurrentColorScheme(switcher.checked ? "dark" : "light");
+        currentColorSchemeStorage.scheme = switcher.checked ? "dark" : "light";
     });
 
     document.body.appendChild(fragment);
@@ -72,11 +69,13 @@ function initToggler() {
  * Deselects the specified list item by removing the "active" class and updating the
  * "aria-current" attribute to "false".
  *
- * @param {HTMLElement} listItem - The list item to deselect.
+ * @param {...HTMLElement} listItems - The list item to deselect.
  */
-function deselectListItem(listItem) {
-    listItem.classList.remove("active");
-    listItem.setAttribute("aria-current", "false");
+function deselectListItem(...listItems) {
+    for (let listItem of listItems) {
+        listItem.classList.remove("active");
+        listItem.setAttribute("aria-current", "false");
+    }
 }
 
 /**
@@ -110,46 +109,66 @@ function initColorSchemeSelect() {
         annotation
     );
 
-    let settings = getSettings();
-    if (settings.colorScheme === "auto") {
+    let preferredScheme = preferredSchemeStorage.scheme;
+    if (preferredScheme === "auto") {
         selectListItem(modeSelectAuto);
-    } else if (settings.colorScheme === "light") {
+    } else if (preferredScheme === "light") {
         selectListItem(modeSelectLight);
-    } else if (settings.colorScheme === "dark") {
+    } else if (preferredScheme === "dark") {
         selectListItem(modeSelectDark);
     }
 
     document.body.appendChild(fragment);
 
     modeSelectAuto.addEventListener("click", () => {
-        setSettings({ colorScheme: "auto" });
-        setCurrentColorScheme("auto");
-        deselectListItem(modeSelectLight);
-        deselectListItem(modeSelectDark);
+        preferredSchemeStorage.scheme = "auto";
+        currentColorSchemeStorage.scheme = "auto";
+        deselectListItem(modeSelectLight, modeSelectDark);
         selectListItem(modeSelectAuto);
     });
 
     modeSelectLight.addEventListener("click", () => {
-        setSettings({ colorScheme: "light" });
-        setCurrentColorScheme("light");
-        deselectListItem(modeSelectAuto);
-        deselectListItem(modeSelectDark);
+        preferredSchemeStorage.scheme = "light";
+        currentColorSchemeStorage.scheme = "light";
+        deselectListItem(modeSelectAuto, modeSelectDark);
         selectListItem(modeSelectLight);
     });
 
     modeSelectDark.addEventListener("click", () => {
-        setSettings({ colorScheme: "dark" });
-        setCurrentColorScheme("dark");
-        deselectListItem(modeSelectAuto);
-        deselectListItem(modeSelectLight);
+        preferredSchemeStorage.scheme = "dark";
+        currentColorSchemeStorage.scheme = "dark";
+        deselectListItem(modeSelectAuto, modeSelectLight);
         selectListItem(modeSelectDark);
     });
 }
 
+function initSystemColorSchemeInfo() {
+    let fragment = createFromHTML(/* html */ `
+        <div class="mt-4 text-center">
+        <span>System Color Scheme:</span>
+        <span ref="systemColorScheme"></span>
+        </div>`);
+
+    const annotation = {
+        systemColorScheme: HTMLSpanElement,
+    };
+
+    let { systemColorScheme } = selectRefs(fragment, annotation);
+
+    systemColorScheme.textContent = systemSchemeStorage.scheme;
+
+    systemSchemeStorage.onSchemeChange((scheme) => {
+        systemColorScheme.textContent = scheme;
+    });
+
+    document.body.appendChild(fragment);
+}
+
 function main() {
-    initThemeModule();
     initToggler();
     initColorSchemeSelect();
+    initSystemColorSchemeInfo();
+    initToggler();
 }
 
 main();

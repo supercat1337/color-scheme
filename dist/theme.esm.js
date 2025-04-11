@@ -2,26 +2,27 @@ import { EventEmitter } from '@supercat1337/event-emitter';
 
 // @ts-check
 
-
-/** @type {EventEmitter<"color-theme-change">} */
-const eventEmitter = new EventEmitter();
-
-/** @type {{colorScheme:"dark"|"light"|"auto"}} */
-let settings = { colorScheme: "auto" };
-
-/** @type {"dark"|"light"} */
-let currentColorScheme = "light";
-
 /**
  * Determines the user's preferred color scheme.
  *
  * @returns {"dark"|"light"} "dark" if the user prefers a dark theme, "light" otherwise.
  */
-function getPreferredColorScheme() {
+function getSystemPreferredColorScheme() {
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
         return "dark";
     }
     return "light";
+}
+
+/**
+ * Applies a color scheme to the root element of the document. The theme is used to set the
+ * `data-bs-theme` attribute, which is used by Bootstrap 5 to determine the theme to use for
+ * styled components.
+ *
+ * @param {"dark"|"light"|string} theme - The color scheme to apply to the element.
+ */
+function applyColorTheme(theme) {
+    document.documentElement.setAttribute("data-bs-theme", theme);
 }
 
 /**
@@ -32,7 +33,7 @@ function getPreferredColorScheme() {
  */
 function onSystemColorSchemeChange(callback) {
     let fn = () => {
-        callback(getPreferredColorScheme());
+        callback(getSystemPreferredColorScheme());
     };
 
     let unsubscriber = () => {
@@ -49,219 +50,268 @@ function onSystemColorSchemeChange(callback) {
 }
 
 /**
- * Subscribes to changes in the current color scheme.
- *
- * @param {(theme: "dark"|"light") => void} callback - The function to call when the color scheme changes.
- * @returns {() => void} A function that can be called to unsubscribe from the color scheme change events.
- */
-function onCurrentColorSchemeChange(callback) {
-    return eventEmitter.on("color-theme-change", callback);
-}
-
-/**
- * Applies a color scheme to the root element of the document. The theme is used to set the
- * `data-bs-theme` attribute, which is used by Bootstrap 5 to determine the theme to use for
- * styled components.
- *
- * @param {"dark"|"light"|"auto"|string} theme - The color scheme to apply to the element.
- */
-function applyColorTheme(theme) {
-    if (theme === "auto") {
-        theme = settings.colorScheme;
-    }
-
-    document.documentElement.setAttribute("data-bs-theme", theme);
-}
-
-/**
  * Applies a color scheme to an HTML element. The theme is used to set the `data-bs-theme` attribute
  * on the root element of the document, which is used by Bootstrap 5 to determine the theme to use for
  * styled components.
  *
- * @param {("dark"|"light"|"auto")} theme - The color scheme to apply to the element.
  * @param {HTMLElement} element - The HTML element to apply the color scheme to.
+ * @param {("dark"|"light"|"auto")} theme - The color scheme to apply to the element.
  */
-function applyColorThemeToElement(theme, element) {
-    if (theme === "auto") {
-        theme = getPreferredColorScheme();
-    }
-
+function applyColorThemeToElement(element, theme) {
     element.setAttribute("data-bs-theme", theme);
 }
 
-/**
- * Adds meta tags to the document head to specify theme colors for light and dark modes.
- *
- * @param {string} [lightColor="#FFFFFF"] - The theme color for light mode.
- * @param {string} [darkColor="#212529"] - The theme color for dark mode.
- */
-function addMetaThemeColor(lightColor = "#FFFFFF", darkColor = "#212529") {
-    /*
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FFFFFF" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#212529" />
-    */
+// @ts-check
 
-    const lightMeta = document.createElement("meta");
-    lightMeta.name = "theme-color";
-    lightMeta.media = "(prefers-color-scheme: light)";
-    lightMeta.content = lightColor;
-    document.head.appendChild(lightMeta);
 
-    const darkMeta = document.createElement("meta");
-    darkMeta.name = "theme-color";
-    darkMeta.media = "(prefers-color-scheme: dark)";
-    darkMeta.content = darkColor;
-    document.head.appendChild(darkMeta);
-}
+class PreferredSchemeStorage {
+    #eventEmitter = new EventEmitter();
 
-let styleSheetUsed = false;
+    /** @type {"dark"|"light"|"auto"} */
+    #preferredColorScheme = "auto";
 
-/**
- * Adds a style sheet to the document head that sets the color scheme of inputs to either light or dark,
- * depending on the user's preferred color scheme.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme
- */
-function adaptInputsToUserPreferredColorScheme() {
-    if (styleSheetUsed) {
-        return;
+    constructor() {
+        /** @type {"dark"|"light"|"auto"|string|null} */
+        let data = localStorage.getItem("preferredColorScheme");
+
+        if (data === "dark" || data === "light" || data === "auto") {
+            this.#preferredColorScheme = data;
+            localStorage.setItem("preferredColorScheme", data);
+        } else {
+            this.#preferredColorScheme = "auto";
+            localStorage.setItem("preferredColorScheme", "auto");
+        }
     }
 
-    let styleSheet = new CSSStyleSheet();
+    /**
+     * @returns {"dark"|"light"|"auto"} The preferred color scheme.
+     */
+    get scheme() {
+        return this.#preferredColorScheme;
+    }
 
-    styleSheet.replaceSync(/* css */ `
+    /**
+     * Sets the preferred color scheme.
+     * @param {"dark"|"light"|"auto"} scheme
+     */
+    set scheme(scheme) {
+        if (scheme === this.#preferredColorScheme) {
+            return;
+        }
+
+        this.#preferredColorScheme = scheme;
+        localStorage.setItem(
+            "preferredColorScheme",
+            this.#preferredColorScheme
+        );
+
+        this.#eventEmitter.emit("preferred-scheme-change", scheme);
+    }
+
+    /**
+     * Subscribes to changes in the preferred color scheme.
+     *
+     * @param {(scheme: "dark"|"light"|"auto") => void} callback - The function to call when the preferred color scheme changes.
+     * @returns {() => void} A function that can be called to unsubscribe from the preferred color scheme change events.
+     */
+    onSchemeChange(callback) {
+        return this.#eventEmitter.on("preferred-scheme-change", callback);
+    }
+}
+
+// @ts-check
+
+
+class SystemSchemeStorage {
+    /**
+     * Subscribes to changes in the system color scheme.
+     *
+     * @param {(scheme: "dark"|"light") => void} callback - The function to call when the system color scheme changes.
+     * @returns {() => void} A function that can be called to unsubscribe from the color scheme change events.
+     */
+    onSchemeChange(callback) {
+        return onSystemColorSchemeChange(callback);
+    }
+
+    /**
+     * Gets the system color scheme.
+     *
+     * @returns {"dark"|"light"} The system color scheme.
+     */
+    get scheme() {
+        return getSystemPreferredColorScheme();
+    }
+}
+
+// @ts-check
+
+
+class CurrentColorSchemeStorage {
+    #eventEmitter = new EventEmitter();
+
+    /** @type {"dark"|"light"} */
+    #currentColorScheme = "light";
+
+    /** @type {PreferredSchemeStorage} */
+    #preferredSchemeStorage;
+
+    /** @type {SystemSchemeStorage} */
+    #systemSchemeStorage;
+
+    /**
+     * The name of the theme for the dark color scheme.
+     * @type {string}
+     */
+    darkThemeName = "dark";
+
+    /**
+     * The name of the theme for the light color scheme.
+     * @type {string}
+     */
+    lightThemeName = "light";
+
+    /**
+     * Initializes the CurrentColorSchemeStorage instance by determining the current color scheme.
+     *
+     * @param {SystemSchemeStorage} systemSchemeStorage - An instance of SystemSchemeStorage to retrieve the system color scheme.
+     * @param {PreferredSchemeStorage} preferredSchemeStorage - An instance of preferredSchemeStorage to retrieve the preferred color scheme.
+     */
+    constructor(systemSchemeStorage, preferredSchemeStorage) {
+        this.#preferredSchemeStorage = preferredSchemeStorage;
+        this.#systemSchemeStorage = systemSchemeStorage;
+
+        let preferredColorScheme = preferredSchemeStorage.scheme;
+        let systemColorScheme = systemSchemeStorage.scheme;
+
+        let loadedColorScheme = /** @type {"dark"|"light"|"unknown"} */ (
+            sessionStorage.getItem("currentColorScheme") || "unknown"
+        );
+
+        if (!(loadedColorScheme == "dark" || loadedColorScheme == "light")) {
+            loadedColorScheme = "unknown";
+        }
+
+        if (loadedColorScheme === "unknown") {
+            this.#currentColorScheme =
+                preferredColorScheme === "auto"
+                    ? systemColorScheme
+                    : preferredColorScheme;
+        } else {
+            this.#currentColorScheme = loadedColorScheme;
+        }
+    }
+
+    /**
+     * Subscribes to changes in the current color scheme.
+     *
+     * @param {(scheme: "dark"|"light") => void} callback - The function to call when the color scheme changes.
+     * @returns {() => void} A function that can be called to unsubscribe from the color scheme change events.
+     */
+    onSchemeChange(callback) {
+        return this.#eventEmitter.on("current-scheme-change", callback);
+    }
+
+    /**
+     * Retrieves the current color scheme.
+     *
+     * @returns {"dark"|"light"} The current color scheme being used.
+     */
+    get scheme() {
+        return this.#currentColorScheme;
+    }
+
+    /**
+     * Sets the current color scheme.
+     * @param {"dark"|"light"|"auto"} colorScheme - The color scheme to set. Must be either "dark", "light" or "auto".
+     */
+    set scheme(colorScheme) {
+        if (
+            colorScheme !== "dark" &&
+            colorScheme !== "light" &&
+            colorScheme !== "auto"
+        ) {
+            throw new Error(
+                "Color scheme must be either 'dark', 'light' or 'auto'."
+            );
+        }
+
+        if (colorScheme === "auto") {
+            colorScheme = this.#preferredSchemeStorage.scheme;
+
+            if (colorScheme === "auto") {
+                colorScheme = this.#systemSchemeStorage.scheme;
+            }
+        }
+
+        if (colorScheme === this.#currentColorScheme) {
+            return;
+        }
+
+        sessionStorage.setItem("currentColorScheme", colorScheme);
+
+        this.#currentColorScheme = colorScheme;
+        this.#eventEmitter.emit(
+            "current-scheme-change",
+            this.#currentColorScheme
+        );
+    }
+
+    /**
+     * Returns the default theme name based on the current color scheme.
+     *
+     * @returns {string} The name of the theme. Returns `darkThemeName` if the current color scheme is "dark",
+     * otherwise returns `lightThemeName`.
+     */
+    getDefaultTheme() {
+        if (this.#currentColorScheme === "dark") {
+            return this.darkThemeName;
+        }
+
+        return this.lightThemeName;
+    }
+}
+
+// @ts-check
+
+
+let metaElement = document.createElement("meta");
+metaElement.name = "theme-color";
+document.head.appendChild(metaElement);
+
+let styleSheet = new CSSStyleSheet();
+styleSheet.replaceSync(/* css */ `
     :root {
         color-scheme: light dark;
+    }`);
+document.adoptedStyleSheets.push(styleSheet);
+
+// storages
+const systemSchemeStorage = new SystemSchemeStorage();
+const preferredSchemeStorage = new PreferredSchemeStorage();
+const currentColorSchemeStorage = new CurrentColorSchemeStorage(
+    systemSchemeStorage,
+    preferredSchemeStorage
+);
+
+let lightColor = "#FFFFFF",
+    darkColor = "#212529";
+
+metaElement.content =
+    currentColorSchemeStorage.scheme === "dark" ? darkColor : lightColor;
+
+systemSchemeStorage.onSchemeChange((colorScheme) => {
+    let preferredColorScheme = preferredSchemeStorage.scheme;
+    if (preferredColorScheme === "auto") {
+        currentColorSchemeStorage.scheme = colorScheme;
     }
-    `);
+});
 
-    document.adoptedStyleSheets.push(styleSheet);
-    styleSheetUsed = true;
-}
+currentColorSchemeStorage.onSchemeChange((colorScheme) => {
+    metaElement.content = colorScheme === "dark" ? darkColor : lightColor;
 
-/**
- * Loads theme settings from local storage.
- *
- * If no settings are found, default settings are used.
- *
- * @returns {{colorScheme:"dark"|"light"|"auto"}} The loaded settings.
- */
-function loadSettings() {
-    try {
-        /** @type {string|null} */
-        let data = localStorage.getItem("theme-settings");
+    applyColorTheme(currentColorSchemeStorage.getDefaultTheme());
+});
 
-        if (typeof data === "string") {
-            settings = JSON.parse(data);
-        }
-    } catch (e) {
-        localStorage.setItem(
-            "theme-settings",
-            JSON.stringify({ colorScheme: "auto" })
-        );
-    }
+applyColorTheme(currentColorSchemeStorage.getDefaultTheme());
 
-    return settings;
-}
-
-/**
- * Saves theme settings to local storage.
- */
-function saveSettings() {
-    localStorage.setItem("theme-settings", JSON.stringify(settings));
-}
-
-/**
- * Retrieves the current theme settings.
- *
- * @returns {{colorScheme:"dark"|"light"|"auto"}} The current theme settings.
- */
-function getSettings() {
-    return settings;
-}
-
-/**
- * Sets new theme settings and saves them to local storage.
- *
- * @param { {colorScheme:"dark"|"light"|"auto"} } newSettings - The new theme settings.
- */
-function setSettings(newSettings) {
-    settings = newSettings;
-    saveSettings();
-}
-
-/**
- * Initializes the theme module by loading theme settings from local storage, setting the theme
- * meta tags, adapting inputs to the user's preferred color scheme, and setting up an event
- * listener to update the theme when the user's preferred color scheme changes.
- *
- * @param {string} [lightColor="#FFFFFF"] - The theme color for light mode.
- * @param {string} [darkColor="#212529"] - The theme color for dark mode.
- */
-function initThemeModule(lightColor, darkColor) {
-    addMetaThemeColor(lightColor, darkColor);
-    adaptInputsToUserPreferredColorScheme();
-    loadSettings();
-
-    let preferredColorScheme = getPreferredColorScheme();
-
-    document.documentElement.setAttribute(
-        "data-bs-theme",
-        settings.colorScheme === "auto"
-            ? preferredColorScheme
-            : settings.colorScheme
-    );
-
-    currentColorScheme =
-        settings.colorScheme === "auto"
-            ? preferredColorScheme
-            : settings.colorScheme;
-
-    applyColorTheme(settings.colorScheme);
-
-    onSystemColorSchemeChange((colorScheme) => {
-        if (settings.colorScheme === "auto") {
-            setCurrentColorScheme(colorScheme);
-        }
-    });
-}
-
-/**
- * Retrieves the current color scheme.
- *
- * @returns {"dark"|"light"} The current color scheme being used.
- */
-function getCurrentColorScheme() {
-    return currentColorScheme;
-}
-
-/**
- * Sets the current color scheme. The color scheme is used by Bootstrap 5 to determine the style to
- * use for styled components. The color scheme is also used to update the theme meta tags.
- *
- * @param {"dark"|"light"|"auto"} colorScheme - The color scheme to set. Must be either "dark" or "light."
- */
-function setCurrentColorScheme(colorScheme) {
-    if (
-        colorScheme !== "dark" &&
-        colorScheme !== "light" &&
-        colorScheme !== "auto"
-    ) {
-        throw new Error(
-            "Color scheme must be either 'dark', 'light', or 'auto'."
-        );
-    }
-
-    let theme =
-        colorScheme === "auto" ? getPreferredColorScheme() : colorScheme;
-
-    if (theme === currentColorScheme) {
-        return;
-    }
-
-    applyColorTheme(theme);
-    currentColorScheme = theme;
-    eventEmitter.emit("color-theme-change", currentColorScheme);
-}
-
-export { adaptInputsToUserPreferredColorScheme, addMetaThemeColor, applyColorThemeToElement, getCurrentColorScheme, getPreferredColorScheme, getSettings, initThemeModule, onCurrentColorSchemeChange, onSystemColorSchemeChange, setCurrentColorScheme, setSettings };
+export { applyColorTheme, applyColorThemeToElement, currentColorSchemeStorage, preferredSchemeStorage, systemSchemeStorage };
