@@ -1,7 +1,7 @@
 {
   "name": "@supercat1337/color-scheme",
   "version": "1.0.0",
-  "description": "A lightweight, efficient, and easy-to-use scheme management system for JavaScript applications.",
+  "description": "A tiny, fast, and easy-to-use color scheme and color theme management system for JavaScript applications that works with Bootstrap 5 and supports dark and light themes.",
   "main": "index.js",
   "scripts": {
     "preinstall": "npm i -g esbuild && npm i -g rollup",
