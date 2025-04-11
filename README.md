@@ -91,7 +91,6 @@ Methods:
 
 Properties:
 
--   `scheme`: The current color scheme, which can be either "dark" or "light".
 -   `darkThemeName`: The name of the dark theme.
 -   `lightThemeName`: The name of the light theme.
 
