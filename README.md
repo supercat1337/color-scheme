@@ -68,29 +68,32 @@ systemSchemeStorage.onSchemeChange((scheme) => {
 
 ### SystemSchemeStorage
 
-The SystemSchemeStorage object manages the system color scheme, providing methods to get and subscribe to changes in the scheme.
+`The SystemSchemeStorage object` manages the system color scheme, providing methods to get and subscribe to changes in the scheme.
 
 Methods:
-onSchemeChange(callback): Subscribes to changes in the system color scheme and calls the provided callback function when the scheme changes. Returns an unsubscribe function to stop receiving updates.
-get scheme(): Returns the current system color scheme, which can be either "dark" or "light".
+
+-   `onSchemeChange`(callback): Subscribes to changes in the system color scheme and calls the provided callback function when the scheme changes. Returns an -unsubscribe function to stop receiving updates.
+-   get `scheme`: Returns the current system color scheme, which can be either "dark" or "light".
 
 ### PreferredSchemeStorage
 
-The PreferredSchemeStorage object manages the user's preferred color scheme, storing it in local storage and providing methods to get, set, and subscribe to changes in the scheme.
+`The PreferredSchemeStorage object` manages the user's preferred color scheme, storing it in local storage and providing methods to get, set, and subscribe to changes in the scheme.
 
 Methods:
-get scheme: Returns the current preferred color scheme.
-set scheme: Sets the preferred color scheme to a new value, updating local storage and emitting an event if the scheme changes.
-onSchemeChange: Subscribes to changes in the preferred color scheme, calling the provided callback function when the scheme changes, and returns an unsubscribe function.
+
+-   get `scheme`: Returns the current preferred color scheme.
+-   set `scheme`: Sets the preferred color scheme to a new value, updating local storage and emitting an event if the scheme changes.
+-   `onSchemeChange`: Subscribes to changes in the preferred color scheme, calling the provided callback function when the scheme changes, and returns an unsubscribe function.
 
 ### CurrentColorSchemeStorage
 
-The CurrentColorSchemeStorage object manages the current color scheme, storing it in local storage and providing methods to get, set, and subscribe to changes in the scheme.
+`The CurrentColorSchemeStorage object` manages the current color scheme, storing it in local storage and providing methods to get, set, and subscribe to changes in the scheme.
 
 Methods:
-get scheme: Returns the current color scheme.
-set scheme: Sets the current color scheme to a new value, updating local storage and emitting an event if the scheme changes.
-onSchemeChange: Subscribes to changes in the current color scheme, calling the provided callback function when the scheme changes, and returns an unsubscribe function.
+
+-   get `scheme`: Returns the current color scheme.
+-   set `scheme`: Sets the current color scheme to a new value, updating local storage and emitting an event if the scheme changes.
+-   `onSchemeChange`: Subscribes to changes in the current color scheme, calling the provided callback function when the scheme changes, and returns an unsubscribe function.
 
 ## Functions
 
