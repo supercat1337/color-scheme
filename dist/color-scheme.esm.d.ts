@@ -98,4 +98,4 @@ declare class SystemSchemeStorage {
     get scheme(): "dark" | "light";
 }
 export {};
-//# sourceMappingURL=theme.esm.d.ts.map
+//# sourceMappingURL=color-scheme.esm.d.ts.map

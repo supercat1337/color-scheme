@@ -1,2 +1,2 @@
-export * from "./dist/theme.esm.js";
+export * from "./dist/color-scheme.esm.js";
 //# sourceMappingURL=index.d.ts.map

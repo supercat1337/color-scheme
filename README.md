@@ -15,7 +15,7 @@ import {
     currentColorSchemeStorage,
     preferredSchemeStorage,
     systemSchemeStorage,
-} from "@supercat1337/theme";
+} from "@supercat1337/color-scheme";
 
 // You can set the color scheme directly using the applyColorTheme function.
 applyColorTheme("dark");
