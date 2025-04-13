@@ -85,9 +85,9 @@ Methods:
 -   set `scheme`: Sets the preferred color scheme to a new value, updating local storage and emitting an event if the scheme changes.
 -   `onSchemeChange`: Subscribes to changes in the preferred color scheme, calling the provided callback function when the scheme changes, and returns an unsubscribe function.
 
-### currentSchemeStorage
+### CurrentSchemeStorage
 
-`The currentSchemeStorage object` manages the current color scheme, storing it in local storage and providing methods to get, set, and subscribe to changes in the scheme.
+`The CurrentSchemeStorage object` manages the current color scheme, storing it in local storage and providing methods to get, set, and subscribe to changes in the scheme.
 
 Properties:
 
