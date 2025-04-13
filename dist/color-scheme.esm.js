@@ -146,7 +146,7 @@ class SystemSchemeStorage {
 // @ts-check
 
 
-class CurrentColorSchemeStorage {
+class CurrentSchemeStorage {
     #eventEmitter = new EventEmitter();
 
     /** @type {"dark"|"light"} */
@@ -171,7 +171,7 @@ class CurrentColorSchemeStorage {
     lightThemeName = "light";
 
     /**
-     * Initializes the CurrentColorSchemeStorage instance by determining the current color scheme.
+     * Initializes the currentSchemeStorage instance by determining the current color scheme.
      *
      * @param {SystemSchemeStorage} systemSchemeStorage - An instance of SystemSchemeStorage to retrieve the system color scheme.
      * @param {PreferredSchemeStorage} preferredSchemeStorage - An instance of preferredSchemeStorage to retrieve the preferred color scheme.
@@ -274,10 +274,6 @@ class CurrentColorSchemeStorage {
 // @ts-check
 
 
-let metaElement = document.createElement("meta");
-metaElement.name = "theme-color";
-document.head.appendChild(metaElement);
-
 let styleSheet = new CSSStyleSheet();
 styleSheet.replaceSync(/* css */ `
     :root {
@@ -288,7 +284,7 @@ document.adoptedStyleSheets.push(styleSheet);
 // storages
 const systemSchemeStorage = new SystemSchemeStorage();
 const preferredSchemeStorage = new PreferredSchemeStorage();
-const currentColorSchemeStorage = new CurrentColorSchemeStorage(
+const currentSchemeStorage = new CurrentSchemeStorage(
     systemSchemeStorage,
     preferredSchemeStorage
 );
@@ -296,22 +292,27 @@ const currentColorSchemeStorage = new CurrentColorSchemeStorage(
 let lightColor = "#FFFFFF",
     darkColor = "#212529";
 
+let metaElement = document.createElement("meta");
+metaElement.name = "theme-color";
 metaElement.content =
-    currentColorSchemeStorage.scheme === "dark" ? darkColor : lightColor;
+    currentSchemeStorage.scheme === "dark" ? darkColor : lightColor;
+document.head.appendChild(metaElement);
+
+currentSchemeStorage.onSchemeChange((colorScheme) => {
+    metaElement.content = colorScheme === "dark" ? darkColor : lightColor;
+});
 
 systemSchemeStorage.onSchemeChange((colorScheme) => {
     let preferredColorScheme = preferredSchemeStorage.scheme;
     if (preferredColorScheme === "auto") {
-        currentColorSchemeStorage.scheme = colorScheme;
+        currentSchemeStorage.scheme = colorScheme;
     }
 });
 
-currentColorSchemeStorage.onSchemeChange((colorScheme) => {
-    metaElement.content = colorScheme === "dark" ? darkColor : lightColor;
-
-    applyColorTheme(currentColorSchemeStorage.getDefaultTheme());
+currentSchemeStorage.onSchemeChange((colorScheme) => {
+    applyColorTheme(currentSchemeStorage.getDefaultTheme());
 });
 
-applyColorTheme(currentColorSchemeStorage.getDefaultTheme());
+applyColorTheme(currentSchemeStorage.getDefaultTheme());
 
-export { applyColorTheme, applyColorThemeToElement, currentColorSchemeStorage, preferredSchemeStorage, systemSchemeStorage };
+export { applyColorTheme, applyColorThemeToElement, currentSchemeStorage, preferredSchemeStorage, systemSchemeStorage };

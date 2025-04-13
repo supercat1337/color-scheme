@@ -2,7 +2,7 @@
 import {
     applyColorTheme,
     applyColorThemeToElement,
-    currentColorSchemeStorage,
+    currentSchemeStorage,
     preferredSchemeStorage,
     systemSchemeStorage,
 } from "../../dist/color-scheme.bundle.esm.js";
@@ -22,23 +22,23 @@ const switcher = /** @type {HTMLInputElement} */ (
 );
 
 // Initialize the switcher to reflect the current color scheme.
-let darkmode_is_on = currentColorSchemeStorage.scheme === "dark";
+let darkmode_is_on = currentSchemeStorage.scheme === "dark";
 switcher.checked = darkmode_is_on;
 
 // Listen for changes in the current color scheme and update the switcher accordingly.
-currentColorSchemeStorage.onSchemeChange((scheme) => {
+currentSchemeStorage.onSchemeChange((scheme) => {
     let darkmode_is_on = scheme === "dark";
     switcher.checked = darkmode_is_on;
 });
 
 // Listen for changes in the switcher and update the current color scheme accordingly.
 switcher.addEventListener("change", () => {
-    currentColorSchemeStorage.scheme = switcher.checked ? "dark" : "light";
+    currentSchemeStorage.scheme = switcher.checked ? "dark" : "light";
 });
 
 // You can also save the user's preferred color scheme using localStorage.
 // This will allow the user to switch back to their preferred color scheme after closing their browser.
-preferredSchemeStorage.scheme = currentColorSchemeStorage.scheme;
+preferredSchemeStorage.scheme = currentSchemeStorage.scheme;
 
 // You can also listen for changes in the user's preferred color scheme using the onSchemeChange function.
 preferredSchemeStorage.onSchemeChange((scheme) => {

@@ -4,7 +4,7 @@ import { EventEmitter } from "@supercat1337/event-emitter";
 import { SystemSchemeStorage } from "./systemScheme.js";
 import { PreferredSchemeStorage } from "./preferredScheme.js";
 
-class CurrentColorSchemeStorage {
+class CurrentSchemeStorage {
     #eventEmitter = new EventEmitter();
 
     /** @type {"dark"|"light"} */
@@ -29,7 +29,7 @@ class CurrentColorSchemeStorage {
     lightThemeName = "light";
 
     /**
-     * Initializes the CurrentColorSchemeStorage instance by determining the current color scheme.
+     * Initializes the currentSchemeStorage instance by determining the current color scheme.
      *
      * @param {SystemSchemeStorage} systemSchemeStorage - An instance of SystemSchemeStorage to retrieve the system color scheme.
      * @param {PreferredSchemeStorage} preferredSchemeStorage - An instance of preferredSchemeStorage to retrieve the preferred color scheme.
@@ -129,4 +129,4 @@ class CurrentColorSchemeStorage {
     }
 }
 
-export { CurrentColorSchemeStorage };
+export { CurrentSchemeStorage };

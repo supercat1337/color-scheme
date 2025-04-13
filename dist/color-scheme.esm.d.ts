@@ -15,12 +15,12 @@ export function applyColorTheme(theme: "dark" | "light" | string): void;
  * @param {("dark"|"light"|"auto")} theme - The color scheme to apply to the element.
  */
 export function applyColorThemeToElement(element: HTMLElement, theme: ("dark" | "light" | "auto")): void;
-export const currentColorSchemeStorage: CurrentColorSchemeStorage;
+export const currentSchemeStorage: CurrentSchemeStorage;
 export const preferredSchemeStorage: PreferredSchemeStorage;
 export const systemSchemeStorage: SystemSchemeStorage;
-declare class CurrentColorSchemeStorage {
+declare class CurrentSchemeStorage {
     /**
-     * Initializes the CurrentColorSchemeStorage instance by determining the current color scheme.
+     * Initializes the currentSchemeStorage instance by determining the current color scheme.
      *
      * @param {SystemSchemeStorage} systemSchemeStorage - An instance of SystemSchemeStorage to retrieve the system color scheme.
      * @param {PreferredSchemeStorage} preferredSchemeStorage - An instance of preferredSchemeStorage to retrieve the preferred color scheme.
